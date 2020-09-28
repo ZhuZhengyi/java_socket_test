@@ -33,14 +33,14 @@ $(ClientJar): $(ClientSrc)
 	@echo "build client done"
 
 phony += run
-run: server client
+run: run_server run_client
 
 phony += server
-server: $(ServerJar)
+run_server: $(ServerJar)
 	java -jar $^
 
 phony += client
-client: $(ClientJar)
+run_client: $(ClientJar)
 	java -jar $^
 
 phony += pre

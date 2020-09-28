@@ -7,9 +7,11 @@ import java.net.Socket;
 // Client for Server1, Server2, Server3
 public class Client {
 
+    int opCount = 0;
     private Socket socket = null;
     private DataOutputStream dos = null;
 
+    long startTime = System.currentTimeMillis();
     public Client(String serverName, int serverPort, String message) {
         try {
             socket = new Socket(serverName, serverPort);
@@ -20,9 +22,9 @@ public class Client {
 
             while (true) {
                 try {
-                    System.out.println("Message to server : " + message);
                     dos.writeBytes(message);
                     dos.flush();
+                    opCount++;
                 } catch (IOException e) {
                     break;
                 }
@@ -31,6 +33,9 @@ public class Client {
             socket.close();
         } catch (IOException e) {
             System.out.println("Error : " + e.getMessage());
+        } finally {
+            long endTime = System.currentTimeMillis();
+            System.out.println("IOPS : " + opCount * 1000 / (endTime - startTime) );
         }
     }
 

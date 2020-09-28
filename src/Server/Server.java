@@ -19,7 +19,10 @@ public class Server {
     private BufferedInputStream bis = null;
     private DataInputStream dis = null;
 
-    public Server(int port) {
+    public Server(int port, int size) {
+
+        int opCount = 0;
+        long startTime = System.currentTimeMillis();
         try {
             serverSocket = new ServerSocket(port);
             System.out.println("Server started on port " + serverSocket.getLocalPort() + "...");
@@ -31,13 +34,17 @@ public class Server {
             bis = new BufferedInputStream(socket.getInputStream());
             dis = new DataInputStream(bis);
 
+            int i = 1000;
             while (true) {
                 try {
-                    String messageFromClient = new String(dis.readNBytes(64)) ;
-                    if (messageFromClient.equals("exit")) {
+                    String messageFromClient = new String(dis.readNBytes(size)) ;
+                    opCount++;
+                    if (messageFromClient.equals("")) {
                         break;
                     }
-                    System.out.println("Client [" + socket.getRemoteSocketAddress() + "] : " + messageFromClient);
+                    if (opCount % i == 0 ) {
+                        System.out.println("Client [" + socket.getRemoteSocketAddress() + "] : " + opCount);
+                    }
                 } catch (IOException e) {
                     break;
                 }
@@ -47,14 +54,21 @@ public class Server {
             System.out.println("Client " + socket.getRemoteSocketAddress() + " disconnect from server...");
         } catch (IOException e) {
             System.out.println("Error : " + e);
+        } finally {
+            long endTime = System.currentTimeMillis();
+            System.out.println("IOPS : " + opCount * 1000 / (endTime - startTime) );
         }
     }
 
     public static void main(String args[]) {
         int serverPort = 8081;
+        int recvSize = 64;
         if (args.length > 0) {
             serverPort = Integer.parseInt(args[0]);
         }
-        Server server = new Server(serverPort);
+        if (args.length > 1) {
+            recvSize = Integer.parseInt(args[1]);
+        }
+        Server server = new Server(serverPort, recvSize);
     }
 }
