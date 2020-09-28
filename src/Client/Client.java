@@ -3,13 +3,10 @@ package Client;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Scanner;
 
 // Client for Server1, Server2, Server3
 public class Client {
 
-    private String serverName = "localhost";
-    private int serverPort = 8081;
     private Socket socket = null;
     private DataOutputStream dos = null;
 
@@ -21,11 +18,9 @@ public class Client {
 
             dos = new DataOutputStream(socket.getOutputStream());
 
-            Scanner scan=new Scanner(System.in);
             while (true) {
                 try {
-                    //System.out.print("Message to server : ");
-
+                    System.out.println("Message to server : " + message);
                     dos.writeBytes(message);
                     dos.flush();
                 } catch (IOException e) {
@@ -42,12 +37,14 @@ public class Client {
     public static void main(String args[]) {
         String serverName = "localhost";
         int serverPort = 8081;
-        String message = "0123456789" +
+        String message = "xx" +
                         "0123456789" +
                         "0123456789" +
                         "0123456789" +
                         "0123456789" +
-                        "0123" ;
+                        "0123456789" +
+                        "0123456789" +
+                        "xx" ;
         if (args.length > 0) {
             serverName = args[0];
         }

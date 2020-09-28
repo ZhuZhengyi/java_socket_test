@@ -6,20 +6,20 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-// SERVER : Single Server                       
+// SERVER : Single Server
 // TIPE : One-Way Communication (Client to Server)
-// DESCRIPTION : 
-// A simple server that will accept a single client connection and display everything the client says on the screen. 
+// DESCRIPTION :
+// A simple server that will accept a single client connection and display everything the client says on the screen.
 // If the client user types "exit", the client and the server will both quit.
 public class Server {
 
-    private int port = 8081;
+    //private int port = 8081;
     private Socket socket = null;
     private ServerSocket serverSocket = null;
     private BufferedInputStream bis = null;
     private DataInputStream dis = null;
 
-    public Server() {
+    public Server(int port) {
         try {
             serverSocket = new ServerSocket(port);
             System.out.println("Server started on port " + serverSocket.getLocalPort() + "...");
@@ -33,7 +33,7 @@ public class Server {
 
             while (true) {
                 try {
-                    String messageFromClient = dis.readUTF();
+                    String messageFromClient = new String(dis.readNBytes(64)) ;
                     if (messageFromClient.equals("exit")) {
                         break;
                     }
@@ -51,6 +51,10 @@ public class Server {
     }
 
     public static void main(String args[]) {
-        Server server = new Server();
+        int serverPort = 8081;
+        if (args.length > 0) {
+            serverPort = Integer.parseInt(args[0]);
+        }
+        Server server = new Server(serverPort);
     }
 }
