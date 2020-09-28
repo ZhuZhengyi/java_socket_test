@@ -1,47 +1,56 @@
-/*
- * Server.java
- * Copyright (C) 2020 zhuzhengyi <zhuzhengyi@ZBMAC-C02VQ7GQ7.local>
- *
- * Distributed under terms of the MIT license.
- */
-
-
 package Server;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
-import java.util.TimerTask;
-import java.util.Timer;
-import java.util.Date;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+// SERVER : Single Server                       
+// TIPE : One-Way Communication (Client to Server)
+// DESCRIPTION : 
+// A simple server that will accept a single client connection and display everything the client says on the screen. 
+// If the client user types "exit", the client and the server will both quit.
 public class Server {
-    private static SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HH:mm:ss");
-    public static void main(String[] args){
+
+    private int port = 8081;
+    private Socket socket = null;
+    private ServerSocket serverSocket = null;
+    private BufferedInputStream bis = null;
+    private DataInputStream dis = null;
+
+    public Server() {
         try {
-            TCPServer.accept();
-            new Timer("Timer").schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    TCPServer.broadcast(df.format(new Date()));
+            serverSocket = new ServerSocket(port);
+            System.out.println("Server started on port " + serverSocket.getLocalPort() + "...");
+            System.out.println("Waiting for client...");
+
+            socket = serverSocket.accept();
+            System.out.println("Client " + socket.getRemoteSocketAddress() + " connected to server...");
+
+            bis = new BufferedInputStream(socket.getInputStream());
+            dis = new DataInputStream(bis);
+
+            while (true) {
+                try {
+                    String messageFromClient = dis.readUTF();
+                    if (messageFromClient.equals("exit")) {
+                        break;
+                    }
+                    System.out.println("Client [" + socket.getRemoteSocketAddress() + "] : " + messageFromClient);
+                } catch (IOException e) {
+                    break;
                 }
-            }, 1000,5000);
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-            String str;
-            //因为ClientListen是异步线程，使用键盘输入流将主线程阻塞住，保证跟ClientListen线程同步，同时可控制ClientListen服务的退出
-            do{
-                str = bufferedReader.readLine();
-            }while (str.equalsIgnoreCase("serverExit"));
-        }catch (Exception e){
-            System.out.println("监听请求过程中异常退出");
-        }
-        try {
-            TCPServer.stop();
+            }
+            dis.close();
+            socket.close();
+            System.out.println("Client " + socket.getRemoteSocketAddress() + " disconnect from server...");
         } catch (IOException e) {
-            System.out.println("关闭套接字过程中出现异常");
-        } finally {
-            System.out.println("服务器端套接字已关闭！");
+            System.out.println("Error : " + e);
         }
     }
-}
 
+    public static void main(String args[]) {
+        Server server = new Server();
+    }
+}
