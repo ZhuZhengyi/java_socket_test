@@ -15,6 +15,7 @@ public class Client {
     public Client(String serverName, int serverPort, String message) {
         try {
             socket = new Socket(serverName, serverPort);
+            socket.setTcpNoDelay(true);
             System.out.println("Client started on port " + socket.getLocalPort()+"...");
             System.out.println("Connected to server " + socket.getRemoteSocketAddress());
 
@@ -23,7 +24,7 @@ public class Client {
             while (true) {
                 try {
                     dos.writeBytes(message);
-                    dos.flush();
+                    //dos.flush();
                     opCount++;
                 } catch (IOException e) {
                     break;

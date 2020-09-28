@@ -37,9 +37,10 @@ public class Server {
             int i = 1000;
             while (true) {
                 try {
-                    String messageFromClient = new String(dis.readNBytes(size)) ;
+                    //String messageFromClient = new String(dis.readNBytes(size)) ;
+                    byte[] data = dis.readNBytes(size) ;
                     opCount++;
-                    if (messageFromClient.equals("")) {
+                    if (data.length < 1) {
                         break;
                     }
                     if (opCount % i == 0 ) {
